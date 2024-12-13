@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectShop - Get Regular Discount Offers</title>
+    <link rel="icon" type="image/png" href="img/a.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        body {
+            margin: 0 0;
+            padding: 0;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .product-card {
+            border: 1px solid #ccc;
+            transition: transform 0.3s;
+        }
+
+        .product-list a {
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-container {
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .fullDetail-card-img-container .product-img {
+            width: 500px;
+            height: 400px;
+        }
+
+        .product-img {
+            width: 70%;
+            height: 220px;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.1);
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            text-align: left;
+        }
+
+        .card-title {
+            font-size: 1.2rem !important;
+        }
+
+        .card-body button {
+            width: 120px !important;
+            font-size: 14px !important;
+        }
+
+        .cart-card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .purchase-list {
+            vertical-align: middle;
+        }
+
+
+        .typewriter {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 4px solid #ffd700;
+            animation: typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite;
+        }
+
+        .main-loader {
+            background-color: transparent;
+            width: 100h;
+            height: 100vh;
+            display: none;
+        }
+
+        .loader {
+            /* background-color: red; */
+            position: absolute;
+            top: 30%;
+            right: 40%;
+            padding: 12px;
+            width: 250px;
+            height: 150px;
+        }
+
+        .loader-pic,
+        .loader-text {
+            /* background-color: red; */
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            color: white;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode';
+        }
+
+        .loader-pic {
+            height: 90%;
+        }
+
+        @keyframes fade {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .animate {
+            display: block;
+            animation: fade 4s;
+        }
+
+        @media only screen and (max-width: 1000px) {
+            .loader {
+                right: 25%;
+                /* background-color: red; */
+                width: 400px;
+                height: 300px;
+            }
+        }
+
+        @keyframes typing {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        @keyframes blink-caret {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        .alert-card {
+            position: absolute;
+            z-index: 9999;
+            top: 40%;
+            right: 40%;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid green;
+            border-radius: 20%;
+            width: 200px;
+            height: 200px;
+        }
+
+        .alert-card .tick-div {
+            display: flex;
+            justify-self: center;
+            width: 80%;
+            height: 70%;
+            /* background-color: green; */
+        }
+
+        .alert-card .alert-text {
+            display: flex;
+            justify-self: center;
+            margin-top: 15px;
+            color:black !important;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-white">
+    <section class="main-loader">
+        <div class="loader">
+            <div class="loader-pic">
+                <img src="./img/loader-back.gif">
+            </div>
+            <div class="loader-text">
+                <p>Welcome to ElectroShop!</p>
+            </div>
+        </div>
+    </section>
+    <section id="alert-section">
+    </section>
+    <main id="main" class="">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="">ElectroShop</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon text-light"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showHome()" aria-current="page" href="#home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="product-link2" href="#products">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="product-link3" onclick="showCart()">Cart</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="product-link4" onclick="ProdManage()">Manage Products</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="product-link4" onclick="logout()">LOG OUT</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <section id="main" class="container" style="margin-top: 100px;">
+            <section id="home" class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="https://img.freepik.com/free-photo/workplace-business-modern-male-accessories-laptop-black-background_155003-3944.jpg"
+                        class="img-fluid rounded">
+                </div>
+                <div class="col-md-6 d-flex flex-column align-items-center">
+                    <h5 class="typewriter text-whte text-center mt-4">
+                        Exclusive Deals on Top Tech – Shop the Latest Electronics Now!
+                    </h5>
+                    <a href="#products" class="btn btn-warning mt-3 align-self-end">Shop Now</a>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+
+            <section id="products" class="container my-5">
+                <h2 class="text-center text-warning mb-4">Our Products</h2>
+                <section id="search" class="my-4">
+                    <div class="row d-flex justify-content-end">
+                        <div class="col-md-4 col-sm-10 d-flex">
+                            <label for="Search" class="my-2">Search:</label>
+                            <input type="search" id="prod_seach_txt"
+                                class="form-control mx-3 opacity-50 bg-dark text-light" onkeyup="seachProd(this)">
+                        </div>
+                    </div>
+                </section>
+                <div class="product-list row">
+                </div>
+            </section>
+
+            <section id="cart" class="container my-5 d-none">
+                <h2 class="text-center text-warning mb-4">Cart Products</h2>
+                <div class="cart-product-list row">
+                </div>
+                <div class="purchase-btn-group d-flex justify-content-end d-none">
+                    <button class="btn btn-info" onclick="showBuyForm()">Buy All</button>
+                </div>
+                <hr>
+                <div class="final-sum my-2 d-flex justify-content-end">
+                    <h6 class="mx-2">Total Amount: <span id="total-sum-text" class="text-warning"></span> |</h6>
+                    <h6 class="mx-2">Discount: <span id="total-dis-text" class="text-warning"></span> |</h6>
+                    <h6 class="mx-2">Final Total: <span id="final-sum-text" class="text-warning"></span></h6>
+                </div>
+            </section>
+
+            <section id="addProd" class="container my-5 d-none">
+                <h2 class="text-center text-warning mb-4">Manage Products</h2>
+
+                <div class="manage-btn-group d-flex justify-content-end">
+                </div>
+                <div class="add-form">
+                    <form method="post">
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" id="prod_id_txt">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Name:</label>
+                            <input type="text" class="form-control add-textbox" id="prod_name_txt"
+                                placeholder="e.x. Telivision" required>
+                            <div id="error1" class="error_require_lbl emptyLabel p-2 text-danger d-none">*Field Can Not
+                                Be
+                                Empty
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control add-textbox" id="prod_desc_txt"
+                                placeholder="the best LCD" required>
+                            <div id="error2" class="error_require_lbl emptyLabel p-2 text-danger d-none">*Field Can Not
+                                Be
+                                Empty
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="form-label">Image:</label>
+                            <input type="file" id="prod_img_input" class="form-control bg-dark-subtle">
+                            <img src="" id="form-prod-image" height="150" width="200">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleFormControlTextarea1" class="form-label">Quantity</label>
+                            <input type="number" class="form-control opacity-50" id="prod_quan_txt" value="1" disabled
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleFormControlTextarea1" class="form-label">Price</label>
+                            <input type="number" class="form-control add-textbox" id="prod_price_txt" placeholder="100"
+                                required>
+                            <div id="error3" class="error_require_lbl emptyLabel p-2 text-danger d-none">*Field Can Not
+                                Be
+                                Empty
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" id="addProd_btn" onclick="addProd()" class="btn btn-primary mb-3">Add
+                                Product</button>
+                            <button type="button" id="updateProd_btn" onclick="updateProd()"
+                                class="btn btn-primary mb-3">Update Product</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="add-product-list row mt-5">
+                </div>
+            </section>
+
+            <section id="purchase-frm" class="container my-5 d-none">
+
+                <h2 class="text-center text-warning mb-4">Purchase Form</h2>
+                <div class="row my-5 d-flex justify-content-center">
+                    <div class="col-md-6">
+                        <table class="container table-dark table-responsive purchase-list">
+
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Total Final Price:</label>
+                                <input type="text" class="form-control" id="final_purchase_price_txt" disabled required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Your Name: </label>
+                                <input type="text" class="form-control" id="cust_name_txt" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact No: </label>
+                                <input type="text" class="form-control" id="cust_contact_txt" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address: </label>
+                                <textarea class="form-control" rows="5" cols="5" id="cust_address_txt"
+                                    required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <button type="button" id="purchase_btn" onclick="purchaseProd()"
+                                    class="btn btn-primary mb-3">Purchase</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+    </main>
+    <!-- Home Section -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+
+    <script type="module">
+        import { login_status, changeState } from './modules.js'
+        window.changeState = changeState
+        window.LoginStatus = () => login_status
+
+        import {AlertBox} from './modules/alert.js'
+        window.AlertBox=AlertBox
+    </script>
+
+    <script>
+        function logout() {
+            localStorage.clear()
+            window.location.href = "login.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // console.log(LoginStatus())
+            // localStorage.setItem("login","false")
+            // AlertBox("Kuchh TO Hua")
+            const params = new URLSearchParams(window.location.search);
+            if (params.size > 0 && params.size < 2) {
+                if (params.get("login") == "true") {
+                    // console.log("LOGIN SUCCESS!!")
+                    changeState()
+                }
+            }
+            if (LoginStatus() == false) {
+                window.location.href = "login.html"
+            }
+
+            if (localStorage.getItem("login") == null) {
+                window.location.href = "login.html";
+            } else if (localStorage.getItem("login") == "false") {
+                window.location.href = "login.html";
+            }
+
+
+        })
+
+        window.onpopstate = function () {
+            if (localStorage.getItem("login") === "true") {
+                window.location.href = "main.html?login=true";
+            }
+        };
+        let products = [
+            {
+                id: 1,
+                title: "Samsung Smart TV",
+                description: "Experience the best visuals with a 55-inch 4K UHD display.",
+                imgURL: "https://png.pngtree.com/background/20230522/original/pngtree-the-samsung-tv-with-a-colorful-artwork-picture-image_2692417.jpg",
+                quantity: 1,
+                price: 45000
+            },
+            {
+                id: 2,
+                title: "LG Double-Door Refrigerator",
+                description: "Keep food fresh with a frost-free, energy-efficient fridge.",
+                imgURL: "https://png.pngtree.com/png-vector/20240730/ourmid/pngtree-chic-modern-fridge-with-gold-door-trim-refrigerator-luxurious-accents-solated-png-image_13299214.png",
+                quantity: 1,
+                price: 30000
+            },
+            {
+                id: 3,
+                title: "Whirlpool Washing Machine",
+                description: "Powerful washing with 6th sense technology for tough stains.",
+                imgURL: "https://png.pngtree.com/png-vector/20240513/ourmid/pngtree-fully-automatic-washing-machines-revolutionizing-laundry-days-exploring-the-features-of-png-image_12441751.png",
+                quantity: 1,
+                price: 18000
+            },
+            {
+                id: 4,
+                title: "Apple iPhone 13",
+                description: "Powerful smartphone with A15 Bionic chip and advanced camera.",
+                imgURL: "https://png.pngtree.com/png-vector/20220923/ourmid/pngtree-green-screen-iphone-13-smartphone-with-transparent-background-png-image_6212105.png",
+                quantity: 1,
+                price: 70000
+            },
+            {
+                id: 5,
+                title: "Sony Home Theater",
+                description: "Experience cinema-quality sound with Dolby Atmos.",
+                imgURL: "https://png.pngtree.com/thumb_back/fh260/background/20230702/pngtree-d-illustrated-home-theater-system-with-speakers-subwoofer-and-black-dvd-image_3740975.jpg",
+                quantity: 1,
+                price: 15000
+            }
+        ];
+        var InCart = [];
+        function addToCart(id) {
+            var prod = id.substr(0, Number(id.indexOf("#button")))
+            var index = products.findIndex(p => p.id == prod)
+            if (products[index].quantity == 0) {
+                alert("Out Of Stock")
+            } else {
+                InCart.push(prod)
+            }
+
+            renderFullDetail(prod + "#fullscreen-button")
+        }
+        function seachProd(textbox) {
+            const text = textbox.value
+            var productDisplay = document.querySelector(".product-list");
+            productDisplay.innerHTML = "";
+
+            for (p of products) {
+                var title = p.title.toString().toLowerCase()
+                if (title.includes(text.toLowerCase())) {
+                    productDisplay.innerHTML += `
+                    <div class="col-md-4 mb-4">
+                        <a id="${p.id}#fullscreen-button" onclick="renderFullDetail(this.id)">
+                            <div class="card bg-dark text-white product-card h-100">
+                                <div class="card-img-container">
+                                    <img src="${p.imgURL}"
+                                        class="card-img-top product-img" alt="${p.title} Image">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">${p.title}</h5>
+                                    <p class="card-text mb-4">Price: <s>${p.price}</s> ${(parseFloat(p.price) * 90) / 100}</p>
+                                    <button id="${p.id}#fullscreen-button" onclick="renderFullDetail(this.id)" class="btn btn-info mt-auto d-flex align-self-end">View Details</button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `
+                }
+
+            }
+        }
+        function showHome() {
+            document.getElementById('cart').classList.add('d-none')
+            document.getElementById('home').classList.remove('d-none')
+            document.getElementById('product-link2').classList.remove('d-none')
+            document.getElementById('product-link3').classList.remove('d-none')
+            document.getElementById('product-link4').classList.remove('d-none')
+            document.getElementById('products').classList.remove('d-none')
+            document.getElementById('addProd').classList.add('d-none')
+            document.getElementById('purchase-frm').classList.add('d-none')
+
+            renderProducts()
+        }
+        function showCart() {
+            document.getElementById('cart').classList.remove('d-none')
+            document.getElementById('home').classList.add('d-none')
+            document.getElementById('product-link2').classList.add('d-none')
+            document.getElementById('product-link4').classList.add('d-none')
+            document.getElementById('products').classList.add('d-none')
+            document.getElementById('addProd').classList.add('d-none')
+            document.getElementById('purchase-frm').classList.add('d-none')
+            renderCart()
+        }
+        function addProd() {
+            let validated = false;
+            const add_textbox = document.querySelectorAll('.add-textbox')
+            add_textbox.forEach(textbox => {
+                const emptyLabel = textbox.parentElement.querySelector(".emptyLabel");
+                const input = textbox.value.trim()
+                if (input.length === 0) {
+                    emptyLabel.classList.remove("d-none");
+                } else {
+                    emptyLabel.classList.add("d-none");
+                }
+
+                let count_active_lbl = 0
+                const add_error_lbl = document.querySelectorAll('.error_require_lbl')
+                for (let i = 0; i < add_error_lbl.length; i++) {
+                    if (add_error_lbl[i].classList.contains('d-none')) {
+                        count_active_lbl += 1
+                    }
+                }
+                if (count_active_lbl == add_error_lbl.length) {
+                    // document.getElementById('addProd_btn').classList.remove('disabled')
+                    validated = true;
+                } else {
+                    // document.getElementById('addProd_btn').classList.add('disabled')
+                    validated = false;
+                }
+            });
+            if (validated == true) {
+                const prod_name = document.getElementById('prod_name_txt').value
+                const prod_description = document.getElementById('prod_desc_txt').value
+                const prod_img_input = document.getElementById('prod_img_input').value;
+                const prod_price = document.getElementById('prod_price_txt').value
+                const prod_quantity = document.getElementById('prod_quan_txt').value
+                const last_index = products[products.length - 1].id
+
+                const path_index = prod_img_input.lastIndexOf("\\") + 1;
+                // console.log(prod_img_input.toString().slice(path_index))
+
+                products.push(
+                    {
+                        id: last_index + 1,
+                        title: prod_name,
+                        description: prod_description,
+                        imgURL: "img\\" + prod_img_input.toString().slice(path_index),
+                        quantity: prod_quantity,
+                        price: prod_price
+                    }
+                )
+                document.getElementById('prod_name_txt').value = "";
+                document.getElementById('prod_desc_txt').value = "";
+                document.getElementById('prod_img_input').value = "";
+                document.getElementById('prod_price_txt').value = "";
+                document.getElementById('prod_quan_txt').value = "";
+                ProdManage()
+                AlertBox("Product Added!")
+            }
+
+        }
+        function purchaseProd() {
+            let name = document.getElementById("cust_name_txt").value
+            let con = document.getElementById("cust_contact_txt").value
+            let address = document.getElementById("cust_address_txt").value
+
+            if (name.trim().length === 0 || con.trim().length === 0 || address.trim().length === 0) {
+                alert("Fill Details")
+            } else {
+                InCart = []
+                showHome()
+                AlertBox("Thank You For The Order!")
+                // alert("Thank You For The Order :)")
+            }
+        }
+        function showAddForm() {
+            var prodManage = document.querySelector('.manage-btn-group')
+            prodManage.innerHTML = `<button class="btn btn-info" onclick="ProdManage()">Back</button>`
+            document.querySelector('.add-form').classList.remove('d-none')
+            document.querySelector('.add-product-list').classList.add('d-none')
+            document.querySelector('#addProd_btn').classList.remove('d-none')
+            // document.getElementById("addProd_btn").classList.add('disabled')
+
+            document.querySelector('#form-prod-image').classList.add('d-none')
+            document.querySelector('#updateProd_btn').classList.add('d-none')
+
+            // const textboxs = document.getElementsByClassName('add-textbox')
+            // // console.log(textboxs[0].parentElement.querySelector(".emptyLabel"))
+            // for (let i = 0; i < textboxs.length; i++) {
+            //     textboxs[i].value = ""
+            //     textboxs[i].parentElement.querySelector(".emptyLabel").classList.remove('d-none')
+            // }
+        }
+        function ProdManage() {
+            var prodManage = document.querySelector('.manage-btn-group')
+            prodManage.innerHTML = `<button class="btn btn-info" onclick="showAddForm()">Add Products</button>`
+            document.getElementById('addProd').classList.remove('d-none')
+            document.querySelector('.add-product-list').classList.remove('d-none')
+            document.querySelector('.add-form').classList.add('d-none')
+            document.getElementById('home').classList.add('d-none')
+            document.getElementById('product-link2').classList.add('d-none')
+            document.getElementById('product-link3').classList.add('d-none')
+            document.getElementById('products').classList.add('d-none')
+
+            var productDisplay = document.querySelector(".add-product-list");
+            productDisplay.innerHTML = "";
+
+            for (p of products) {
+                productDisplay.innerHTML += `
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-dark text-white product-card h-100">
+                            <div class="card-img-container">
+                                <img src="${p.imgURL}"
+                                    class="card-img-top product-img" width="200" height="200" alt="${p.title} Image">
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${p.title}</h5>
+                                <p class="card-text mb-4">${p.description}</p>
+                                <p class="card-text mb-4">Quantity:${p.quantity}</p>
+                                <p class="card-text mb-4">Price: <s>${p.price}</s> ${(parseFloat(p.price) * 90) / 100}</p>
+                                <div class="button-group w-100 d-flex"> 
+                                    <button id="${p.id}#Increment-button" onclick="IncrementProd(this.id)"  class="btn btn-success mx-1">Increment</button>
+                                    <button id="${p.id}#Decrement-button" onclick="DecrementProd(this.id)"  class="btn btn-warning mx-1">Decrement</button>
+                                    <button id="${p.id}#update-button" onclick="showUpdateProd(this.id)"  class="btn btn-info mx-1">Update</button>
+                                    <button id="${p.id}#delete-button" onclick="deleteProd(this.id)" class="btn btn-danger mx-1">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        }
+        function showUpdateProd(id) {
+            var prod = id.substr(0, id.indexOf("#update-button"))
+            const index = products.findIndex(p => p.id == prod)
+
+            var prodManage = document.querySelector('.manage-btn-group')
+            prodManage.innerHTML = `<button class="btn btn-info" onclick="ProdManage()">Back</button>`
+            document.querySelector('.add-form').classList.remove('d-none')
+            document.querySelector('.add-product-list').classList.add('d-none')
+            document.querySelector('#updateProd_btn').classList.remove('d-none')
+            document.querySelector('#form-prod-image').classList.remove('d-none')
+            document.querySelector('#addProd_btn').classList.add('d-none')
+
+
+            document.getElementById("prod_id_txt").value = products[index].id
+            document.getElementById("prod_name_txt").value = products[index].title
+            document.getElementById("prod_desc_txt").value = products[index].description
+            document.getElementById("form-prod-image").src = products[index].imgURL
+            document.getElementById("prod_quan_txt").value = products[index].quantity
+            document.getElementById("prod_price_txt").value = products[index].price
+        }
+        function updateProd() {
+            let id = document.getElementById("prod_id_txt").value
+            let title = document.getElementById("prod_name_txt").value
+            let desc = document.getElementById("prod_desc_txt").value
+            let quan = document.getElementById("prod_quan_txt").value
+            let price = document.getElementById("prod_price_txt").value
+
+            let imageUrl = ""
+            let file = document.getElementById("prod_img_input").value
+            if (file != "") {
+                let path_index = file.lastIndexOf("\\") + 1;
+                imageUrl = file.substr(path_index)
+            }
+
+            let prod_index = products.findIndex(p => p.id == id)
+            products[prod_index].title = title
+            products[prod_index].description = desc
+            if (file != "") {
+                products[prod_index].imgURL = "img\\" + imageUrl
+            }
+            products[prod_index].quantity = quan
+            products[prod_index].price = price
+
+
+            document.getElementById('prod_id_txt').value = "";
+            document.getElementById('prod_name_txt').value = "";
+            document.getElementById('prod_desc_txt').value = "";
+            document.getElementById('prod_img_input').value = "";
+            document.getElementById('prod_price_txt').value = "";
+            document.getElementById('prod_quan_txt').value = "";
+            ProdManage()
+            AlertBox("Product Updated!")
+            // alert("Product Updated!")
+        }
+        function IncrementProd(id) {
+            var id = id.substr(0, id.indexOf("#Increment-button"))
+            var index = products.findIndex(p => p.id == id)
+            // console.log(index)
+            var new_quantity = Number(products[index].quantity) + 1
+            // console.log(index)
+            products[index].quantity = new_quantity
+            ProdManage()
+        }
+        function DecrementProd(id) {
+            var id = id.substr(0, id.indexOf("#Decrement-button"))
+            var index = products.findIndex(p => p.id == id)
+            // console.log(index)
+            var new_quantity = Number(products[index].quantity) - 1
+
+            if (new_quantity < 0) {
+                alert('Product Quantity Can Not Be Less Then Zero')
+
+            } else {
+                // console.log(index)
+                products[index].quantity = new_quantity
+                ProdManage()
+            }
+        }
+
+        function deleteProd(id) {
+            var prod_id = id.substr(0, Number(id.indexOf("#delete-button")))
+
+            var index = InCart.findIndex(p => p == prod_id)
+            InCart.splice(index, 1)
+
+            var index = products.findIndex(p => p.id == prod_id);
+            products.splice(index, 1)
+
+            ProdManage()
+            AlertBox("Product Deleted!")
+        }
+        function cartRemove(id) {
+            var prod = id.substr(0, Number(id.indexOf("#cart-button")))
+            var index = InCart.findIndex(p => p == prod)
+            InCart.splice(index, 1)
+            renderCart()
+        }
+        function renderCart() {
+            var total = document.getElementById("total-sum-text")
+            var discount = document.getElementById("total-dis-text")
+            var finalSum = document.getElementById("final-sum-text")
+            const buyClass = document.querySelector(".purchase-btn-group")
+            buyClass.classList.add('d-none')
+
+            total.innerHTML = 0
+            discount.innerHTML = 0
+            finalSum.innerHTML = 0
+
+            let final_total = 0
+            let prod_total = 0
+            let prod_discount = 0
+
+            if (InCart.length > 0) {
+                var productDisplay = document.querySelector('.cart-product-list')
+                productDisplay.innerHTML = "";
+                for (cart of InCart) {
+                    var index = products.findIndex(p => p.id == cart);
+                    var p = products[index];
+
+                    prod_total = prod_total + parseFloat(p.price)
+                    final_total = final_total + (parseFloat(p.price) * 90) / 100
+                    prod_discount = prod_total - final_total
+
+                    productDisplay.innerHTML += `
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-dark text-white product-card h-100">
+                            <div class="card-img-container align-center">
+                                <img src="${p.imgURL}"
+                                    class="card-img-top product-img" alt="${p.title} Image">
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${p.title}</h5>
+                                <p class="card-text mb-4">Price: <s>${p.price}</s> ${(parseFloat(p.price) * 90) / 100}</p>
+                                <button id="${p.id}#cart-button" onclick="cartRemove(this.id)" class="btn btn-danger mt-auto d-flex align-self-end">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `
+                }
+                buyClass.classList.remove('d-none')
+                total.innerHTML = prod_total
+                discount.innerHTML = prod_discount
+                finalSum.innerHTML = final_total
+            }
+            if (InCart.length === 0) {
+
+                var productDisplay = document.querySelector('.cart-product-list')
+                productDisplay.innerHTML = "<p class='text-warning'>No Products In Cart</p>"
+            }
+        }
+        function showBuyForm() {
+
+            const purchaseDiv = document.querySelector("#purchase-frm")
+            purchaseDiv.classList.remove("d-none")
+
+            const cartDiv = document.querySelector("#cart")
+            cartDiv.classList.add('d-none')
+
+            const purchaseList = document.querySelector(".purchase-list")
+            purchaseList.innerHTML = `
+                        <tr align='center'>
+                            <th scope="col">Product Image</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Price</th>
+                        </tr>`
+
+            let final_total = 0
+            if (InCart.length > 0) {
+                for (c of InCart) {
+                    var cart_prod_index = products.findIndex(p => p.id == c)
+                    final_total = final_total + (parseFloat(products[cart_prod_index].price) * 90) / 100
+                    // console.log(products[cart_prod_index].title)
+
+                    purchaseList.innerHTML += `
+                    <tr>
+                        <td align='center'>
+                            <img src="${products[cart_prod_index].imgURL}" style='padding:5px;' width='85px' height='85px' alt="${products[cart_prod_index].title} Image">
+                        </td>
+                        <td align='center'>
+                            <p>${products[cart_prod_index].title}</p>
+                        </td>
+                        <td valign='middle' align='center'>
+                            <p>${(parseFloat(products[cart_prod_index].price) * 90) / 100}</p>
+                        </td>
+                    </tr>
+                    `
+                }
+                document.getElementById("final_purchase_price_txt").value = final_total
+            }
+        }
+        function renderFullDetail(id) {
+            document.getElementById("home").style = "display:none"
+            document.getElementById('product-link2').classList.add('d-none')
+            document.getElementById('search').classList.add('d-none')
+            var productDisplay = document.querySelector(".product-list");
+            var prod_id = id.substr(0, Number(id.indexOf("#fullscreen-button")))
+            var index = products.findIndex(p => p.id == prod_id);
+            var product = products[index];
+
+            var button;
+            if (InCart != null && InCart.includes(prod_id)) {
+                button = `<button type="button" class="btn btn-danger mt-auto">Already In Cart</button>`;
+            } else {
+                button = `<button type="button" id="${prod_id}#button" onclick=addToCart(this.id) class="btn btn-info mt-auto">Add To Cart</button>`;
+            }
+            productDisplay.innerHTML = "";
+            productDisplay.innerHTML += `
+                        <div class="col-md-5 mb-4">
+                            <div class="fullDetail-card-img-container">
+                                <img src="${product.imgURL}"
+                                    class="card-img-top product-img" alt="${product.title} Image">
+                            </div>
+                        </div>
+                        <div class="col-md-5 mb-4  align-self-center">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${product.title}</h5>
+                                <p class="card-text mb-4">${product.description}</p>
+                                <p class="card-text mb-4 text-warning">Currently In Stock: ${product.quantity}</p>
+                                <p class="card-text mb-4">Price: <s>${product.price}</s> ${(parseFloat(product.price) * 90) / 100}</p>
+                                <div class="button-group  d-flex align-self-end">
+                                     <button onclick="renderProducts()" class="btn btn-warning mt-auto mx-2">Back</button>
+                                     ${button}
+                                </div>
+                            </div>
+                        </div>
+                `
+        }
+        function renderProducts() {
+            document.getElementById("home").style.display = "flex"
+            document.getElementById('search').classList.remove('d-none')
+            var productDisplay = document.querySelector(".product-list");
+            productDisplay.innerHTML = "";
+
+            for (p of products) {
+                productDisplay.innerHTML += `
+                    <div class="col-md-4 mb-4">
+                        <a id="${p.id}#fullscreen-button" onclick="renderFullDetail(this.id)">
+                            <div class="card bg-dark text-white product-card h-100">
+                                <div class="card-img-container">
+                                    <img src="${p.imgURL}"
+                                        class="card-img-top product-img" alt="${p.title} Image">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">${p.title}</h5>
+                                    <p class="card-text mb-4">Price: <s>${p.price}</s> ${(parseFloat(p.price) * 90) / 100}</p>
+                                    <button id="${p.id}#fullscreen-button" onclick="renderFullDetail(this.id)" class="btn btn-info mt-auto d-flex align-self-end">View Details</button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `
+            }
+
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        renderProducts();
+    </script>
+</body>
+
+</html>
