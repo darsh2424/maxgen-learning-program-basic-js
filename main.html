@@ -602,7 +602,7 @@
             } else {
                 InCart = []
                 showHome()
-                AlertBox("Thank You For The Order!")
+                AlertBox("Order Submitted :)")
                 // alert("Thank You For The Order :)")
             }
         }
@@ -732,8 +732,8 @@
             // console.log(index)
             var new_quantity = Number(products[index].quantity) - 1
 
-            if (new_quantity < 0) {
-                alert('Product Quantity Can Not Be Less Then Zero')
+            if (new_quantity < 1) {
+                alert('Product Quantity Can Not Be Less Then One')
 
             } else {
                 // console.log(index)
