@@ -142,11 +142,15 @@
                 width: 400px;
                 height: 300px;
             }
+
+            .typewriter {
+                font-size: 14px;
+            }
         }
 
         @keyframes typing {
             0% {
-                width: 0;
+                width: 0%;
             }
 
             100% {
@@ -184,7 +188,7 @@
             display: flex;
             justify-self: center;
             margin-top: 15px;
-            color:black !important;
+            color: black !important;
         }
     </style>
 </head>
@@ -232,7 +236,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <section id="main" class="container" style="margin-top: 100px;">
             <section id="home" class="row align-items-center">
                 <div class="col-md-6">
@@ -390,13 +394,24 @@
         window.changeState = changeState
         window.LoginStatus = () => login_status
 
-        import {AlertBox} from './modules/alert.js'
-        window.AlertBox=AlertBox
+        import { AlertBox } from './modules/alert.js'
+        window.AlertBox = AlertBox
+        let current_user_cart={}
+        let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+        if(user_cart[localStorage.getItem("curr_user")]){
+            current_user_cart=user_cart[localStorage.getItem("curr_user")]
+        }
+        window.current_user_cart=current_user_cart
+        
+        // console.log(user_cart["Darsh_25"])
     </script>
 
     <script>
         function logout() {
-            localStorage.clear()
+            if(localStorage.getItem("login") == "true"){
+                localStorage.setItem("login", "false");
+                localStorage.removeItem("curr_user")
+            }
             window.location.href = "login.html";
         }
 
@@ -415,20 +430,14 @@
                 window.location.href = "login.html"
             }
 
-            if (localStorage.getItem("login") == null) {
-                window.location.href = "login.html";
-            } else if (localStorage.getItem("login") == "false") {
+            if (localStorage.getItem("login") == null || localStorage.getItem("login") == "false") {
                 window.location.href = "login.html";
             }
 
-
+            InCart=window.current_user_cart["cart"]
         })
 
-        window.onpopstate = function () {
-            if (localStorage.getItem("login") === "true") {
-                window.location.href = "main.html?login=true";
-            }
-        };
+
         let products = [
             {
                 id: 1,
@@ -479,6 +488,16 @@
                 alert("Out Of Stock")
             } else {
                 InCart.push(prod)
+                // localStorage.setItem("cart", InCart)
+
+                let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                if(user_cart[localStorage.getItem("curr_user")]){
+                    let user=user_cart[localStorage.getItem("curr_user")]
+                    user["cart"]=InCart
+                }
+                localStorage.setItem('user_cart', JSON.stringify(user_cart));
+               
+                
             }
 
             renderFullDetail(prod + "#fullscreen-button")
@@ -601,6 +620,13 @@
                 alert("Fill Details")
             } else {
                 InCart = []
+                // localStorage.setItem("cart",InCart)
+                let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                if(user_cart[localStorage.getItem("curr_user")]){
+                    let user=user_cart[localStorage.getItem("curr_user")]
+                    user["cart"]=InCart
+                }
+                localStorage.setItem('user_cart', JSON.stringify(user_cart));
                 showHome()
                 AlertBox("Order Submitted :)")
                 // alert("Thank You For The Order :)")
@@ -744,10 +770,9 @@
 
         function deleteProd(id) {
             var prod_id = id.substr(0, Number(id.indexOf("#delete-button")))
-
             var index = InCart.findIndex(p => p == prod_id)
             InCart.splice(index, 1)
-
+            localStorage.setItem("cart",InCart)
             var index = products.findIndex(p => p.id == prod_id);
             products.splice(index, 1)
 
@@ -758,6 +783,13 @@
             var prod = id.substr(0, Number(id.indexOf("#cart-button")))
             var index = InCart.findIndex(p => p == prod)
             InCart.splice(index, 1)
+            // localStorage.setItem("cart",InCart)
+            let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                if(user_cart[localStorage.getItem("curr_user")]){
+                    let user=user_cart[localStorage.getItem("curr_user")]
+                    user["cart"]=InCart
+                }
+                localStorage.setItem('user_cart', JSON.stringify(user_cart));
             renderCart()
         }
         function renderCart() {
@@ -775,7 +807,7 @@
             let prod_total = 0
             let prod_discount = 0
 
-            if (InCart.length > 0) {
+            if (InCart.length > 0 && InCart != null) {
                 var productDisplay = document.querySelector('.cart-product-list')
                 productDisplay.innerHTML = "";
                 for (cart of InCart) {
@@ -891,6 +923,10 @@
                 `
         }
         function renderProducts() {
+            if(localStorage.getItem("cart")!=null){
+                let temp=localStorage.getItem("cart").split(",")
+                InCart=temp
+            }
             document.getElementById("home").style.display = "flex"
             document.getElementById('search').classList.remove('d-none')
             var productDisplay = document.querySelector(".product-list");

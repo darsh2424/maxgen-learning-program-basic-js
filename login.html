@@ -15,7 +15,7 @@
         #otpCheck,
         #checkUsername,
         #forgotPassword {
-            margin-top: 11%;
+            margin-top: 8%;
         }
 
         .login-w-50 {
@@ -84,13 +84,13 @@
 
         @media only screen and (max-width: 1000px) {
             .loader {
-                right: 30%;
+                right: 25%;
             }
 
             #login,
             #register,
             #otpCheck {
-                margin-top: 15%;
+                margin-top: 25%;
             }
 
             .login-w-50 {
@@ -192,7 +192,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-4">
+                    <div class="row">
                         <div class="col-12">
                             <button type="button" id="registerButton" onclick="registerCheck()"
                                 class="btn btn-outline-info w-100">Register</button>
@@ -231,7 +231,7 @@
                             <div class="emptyLabel p-2 text-danger d-none">*Please Enter Password</div>
                             <div class="patternLabel p-2 text-warning d-none"
                                 style="font-size:large;font-family:Arial, Helvetica, sans-serif;">
-                                *Invalid
+                                *Invalid Username or Password
                                 <!-- <br>(Use Lowerscase, Uppercase, Digit and _ Only) -->
                                 <!-- *Password Must have
                             <ul>
@@ -243,7 +243,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-4">
+                    <div class="row">
                         <div class="col-12">
                             <button type="button" id="loginButton" onclick="loginCheck()"
                                 class="btn btn-outline-info w-100">LOGIN</button>
@@ -415,26 +415,33 @@
 
     <script>
         window.otp = ""
-        window.username=""
+        window.username = ""
         let users = [
             {
                 username: 'admin',
                 password: 'admin'
             }
         ]
+        let user_cart = {
+            "admin": {
+                "username": "admin",
+                "password": "admin",
+                "cart": []
+            }
+        }
         document.addEventListener("DOMContentLoaded", function () {
             // document.getElementById('main').classList.remove('d-none')
-            if (localStorage.getItem('login') != null) {
+            if (localStorage.getItem('login') == null) {
                 document.querySelector('.main-loader').classList.add('animate')
                 setTimeout(function () {
                     document.querySelector('.main-loader').classList.remove('animate')
                     document.getElementById('main').classList.remove('d-none')
                 }, 3500)
+                // localStorage.setItem("login", "false")
             } else {
                 document.getElementById('main').classList.remove('d-none')
             }
 
-            localStorage.setItem("login", "false")
         });
         function registerCheck() {
             let username_validated = false;
@@ -500,14 +507,22 @@
                 // window.location.href = "main.html?login=true";
 
                 let isExisted = false;
-                users.forEach(function (element) {
-                    if (element.username == username_txt) {
-                        isExisted = true;
+                let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                for (const username in user_cart) {
+                    if (user_cart.hasOwnProperty(username)) {
+                        const user = user_cart[username];
+                        if (user.username == username_txt) {
+                            isExisted = true;
+                            break;
+                        }
                     }
-                })
+                }
                 if (isExisted == true) {
                     alert("Username Already Exist")
                 } else {
+                    cart = []
+                    user_cart[username_txt] = { "username": username_txt, "password": pass, "cart": cart }
+                    localStorage.setItem('user_cart', JSON.stringify(user_cart));
                     swapOtp()
                 }
             }
@@ -538,13 +553,29 @@
             }
 
             if (username_validated == true && password_validated == true) {
-                if (users.findIndex(u => u.username == username_txt && u.password==pass) === -1) {
+                if (localStorage.getItem("user_cart") == null) {
                     password_textbox.parentElement.querySelector(".patternLabel").classList.remove('d-none');
                 } else {
-                    changeState()
-                    localStorage.setItem("login", "true")
-                    localStorage.setItem("user", username_txt)
-                    window.location.href = "main.html?login=true";
+                    let isExisted = false;
+                    let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                    for (const username in user_cart) {
+                        if (user_cart.hasOwnProperty(username)) {
+                            const user = user_cart[username];
+                            if (user.username == username_txt && user.password == pass) {
+                                isExisted = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isExisted == true) {
+                        changeState()
+                        localStorage.setItem("login", "true")
+                        localStorage.setItem("curr_user", username_txt)
+                        window.location.href = "main.html?login=true";
+                    }
+                    else {
+                        password_textbox.parentElement.querySelector(".patternLabel").classList.remove('d-none');
+                    }
                 }
             }
         }
@@ -559,7 +590,19 @@
                 username_validated = false
             } else {
                 username_textbox.parentElement.querySelector(".emptyLabel").classList.add('d-none');
-                if (users.findIndex(u => u.username == username_txt) === -1) {
+
+                let isExist = false;
+                let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                for (const username in user_cart) {
+                    if (user_cart.hasOwnProperty(username)) {
+                        const user = user_cart[username];
+                        if (user.username == username_txt) {
+                            isExist = true;
+                            break;
+                        }
+                    }
+                }
+                if (isExist == false) {
                     username_textbox.parentElement.querySelector(".patternLabel").classList.remove('d-none');
                 } else {
                     username_textbox.parentElement.querySelector(".patternLabel").classList.add('d-none');
@@ -595,10 +638,10 @@
                             password: pass
                         })
                         swapLogin()
-                    }else{
+                    } else {
                         document.getElementById("checkUsername").classList.add("d-none")
-                        document.getElementById("forgotPassword").classList.remove("d-none") 
-                        window.username=document.getElementById("old_username").value.trim()
+                        document.getElementById("forgotPassword").classList.remove("d-none")
+                        window.username = document.getElementById("old_username").value.trim()
                     }
                 } else {
                     otp_textbox.parentElement.querySelector(".patternLabel").classList.remove("d-none");
@@ -646,6 +689,8 @@
             document.querySelector('#checkUsername').classList.add('d-none')
             document.getElementById("old_otp_div").classList.remove("d-none")
             document.getElementById("new_otp_div").classList.add("d-none")
+            document.getElementById("forgotPassword").classList.add("d-none")
+
 
             document.querySelector('#login').classList.remove('d-none')
 
@@ -668,7 +713,7 @@
             document.getElementById("checkUsername").classList.remove('d-none')
 
         }
-        function forgottenCheck(){
+        function forgottenCheck() {
             let username_validated = false;
             let password_validated = false;
             let conf_password_validated = false;
@@ -681,56 +726,62 @@
             let pass = password_textbox.value;
             let conf = conf_password_textbox.value;
 
-            if (pass.trim() == "") {
-                password_textbox.parentElement.querySelector(".emptyLabel").classList.remove('d-none');
-                password_validated = false
-            } else {
-                password_textbox.parentElement.querySelector(".emptyLabel").classList.add('d-none');
-                password_validated = true
-                const pattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*_)[A-Za-z0-9_]*[A-Za-z0-9]$/;
-                if (pattern.test(pass)) {
-                    password_textbox.parentElement.querySelector(".patternLabel").classList.add("d-none");
-                    password_validated = true
-                } else {
-                    password_textbox.parentElement.querySelector(".patternLabel").classList.remove("d-none");
-                    password_validated = false
-                }
-            }
-            if (conf.trim() == "") {
-                conf_password_textbox.parentElement.querySelector(".emptyLabel").classList.remove('d-none');
-                conf_password_validated = false
-            } else {
-                if (conf === pass) {
-                    conf_password_textbox.parentElement.querySelector(".patternLabel").classList.add("d-none");
-                    conf_password_validated = true
-                } else {
-                    conf_password_textbox.parentElement.querySelector(".patternLabel").classList.remove("d-none");
-                    conf_password_validated = false
-                }
-            }
-
-            if (password_validated == true && conf_password_validated == true) {
-                // changeState()
-                // localStorage.setItem("login", "true")
-                // window.location.href = "main.html?login=true";
-
-                let isExisted = false;
-                let username_txt=window.username
-                users.forEach(function (element) {
-                    if (element.username == username_txt) {
-                        isExisted = true;
+            let isSame = false;
+            let user = {};
+            let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+            for (const username in user_cart) {
+                if (user_cart.hasOwnProperty(username)) {
+                    user = user_cart[username];
+                    if (user.username == window.username && user.password == pass) {
+                        isSame = true;
+                        break;
                     }
-                })
-                if (isExisted == true) {
-                    const index=users.findIndex(u => u.username == username_txt)
-                    users[index]=[{
-                        password:pass
-                    }]
-                    swapLogin()
-                } else {
-                    alert('Username is Invalid')
                 }
-            }            
+            }
+            if (isSame == true) {
+                alert("New Password Must Be Different!");
+            } else {
+                if (pass.trim() == "") {
+                    password_textbox.parentElement.querySelector(".emptyLabel").classList.remove('d-none');
+                    password_validated = false
+                } else {
+                    password_textbox.parentElement.querySelector(".emptyLabel").classList.add('d-none');
+                    password_validated = true
+                    const pattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*_)[A-Za-z0-9_]*[A-Za-z0-9]$/;
+                    if (pattern.test(pass)) {
+                        password_textbox.parentElement.querySelector(".patternLabel").classList.add("d-none");
+                        password_validated = true
+                    } else {
+                        password_textbox.parentElement.querySelector(".patternLabel").classList.remove("d-none");
+                        password_validated = false
+                    }
+                }
+                if (conf.trim() == "") {
+                    conf_password_textbox.parentElement.querySelector(".emptyLabel").classList.remove('d-none');
+                    conf_password_validated = false
+                } else {
+                    if (conf === pass) {
+                        conf_password_textbox.parentElement.querySelector(".patternLabel").classList.add("d-none");
+                        conf_password_validated = true
+                    } else {
+                        conf_password_textbox.parentElement.querySelector(".patternLabel").classList.remove("d-none");
+                        conf_password_validated = false
+                    }
+                }
+
+                if (password_validated == true && conf_password_validated == true) {
+                    // changeState()
+                    // localStorage.setItem("login", "true")
+                    // window.location.href = "main.html?login=true";
+
+                    let username_txt = window.username
+                    let user_cart = JSON.parse(localStorage.getItem('user_cart')) || {};
+                    user_cart[username].password = pass;
+                    localStorage.setItem('user_cart', JSON.stringify(user_cart));
+                    swapLogin()
+
+                }
+            }
         }
         window.onpopstate = function () {
             if (localStorage.getItem("login") == "true") {
@@ -738,9 +789,7 @@
             }
         };
         history.pushState(null, document.title, location.href);
-        window.addEventListener('popstate', function (event) {
-            history.pushState(null, document.title, location.href);
-        });
+
     </script>
 </body>
 
